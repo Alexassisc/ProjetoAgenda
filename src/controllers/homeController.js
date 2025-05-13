@@ -1,4 +1,4 @@
-exports.index = (req, res) => { 
-    res.render('index');
-    return;
+// homeController.js
+exports.index = (req, res) => {
+  res.redirect('/login');
 };

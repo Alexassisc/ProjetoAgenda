@@ -6,22 +6,36 @@
     <div class="col-lg-6 offset-lg-3 my-5">
       <h2 class="text-center">Faça Login</h2>
       <p class="text-center lead">Entre na sua conta para acessar a agenda</p>
-
       
+      <!-- Exibir mensagens de erro -->
+      <% if (errors && errors.length > 0) { %>
+        <div class="alert alert-danger">
+          <% errors.forEach(function(error) { %>
+            <p><%= error %></p>
+          <% }) %>
+        </div>
+      <% } %>
+
       <form action="/login" method="POST">
-        <input type="hidden" name="_csrf", value="<%= csrfToken%>">
+        <!-- CSRF Token -->
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <!-- Campo de E-mail -->
         <div class="mb-3">
           <label for="email" class="form-label">E-mail</label>
-          <input type="email" class="form-control" id="email" name="email" required>
+          <input type="email" class="form-control" id="email" name="email" value="<%= email || '' %>" required>
         </div>
+
+        <!-- Campo de Senha -->
         <div class="mb-3">
           <label for="password" class="form-label">Senha</label>
           <input type="password" class="form-control" id="password" name="password" required>
         </div>
+
+        <!-- Botão de Submissão -->
         <button type="submit" class="btn btn-primary w-100">Entrar</button>
       </form>
 
-     
       <div class="text-center mt-3">
         <p>Não tem uma conta? <a href="/registra">Crie uma conta</a></p>
       </div>

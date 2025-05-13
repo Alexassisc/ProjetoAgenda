@@ -1,0 +1,46 @@
+<%- include('includes/head') %>
+<%- include('includes/nav') %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8 offset-lg-2 my-3">
+      <h1 class="text-center">Minha Agenda</h1>
+
+      <div class="responsive-table">
+        <table class="table my-3">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Sobrenome</th>
+              <th>Telefone</th>
+              <th>Email</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% contatos.forEach(contato => { %>
+              <tr>
+                <td><%= contato.nome %></td>
+                <td><%= contato.sobrenome %></td>
+                <td><%= contato.telefone %></td>
+                <td><%= contato.email %></td>
+                <td>
+                  <a href="/agenda/editar/<%= contato._id %>" class="btn btn-warning">Editar</a>
+                  <form action="/agenda/excluir/<%= contato._id %>" method="POST" style="display:inline;">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+
+      <h3><a href="/agenda/adicionar" class="btn btn-primary">Adicionar Novo Contato</a></h3>
+
+    </div>
+  </div>
+</div>
+
+<%- include('includes/footer') %>

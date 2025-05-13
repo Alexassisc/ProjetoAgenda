@@ -26,16 +26,18 @@ mongoose.connect(connectionString)
 
     // Configuração da sessão
     const sessionOptions = session({
-      secret: 'asasadssadasfasf asasfasfasdasdasdafsafasdasdada',
+      secret: process.env.SESSION_SECRET,
       store: MongoStore.create({
         mongoUrl: process.env.MONGO_CONNECTION,
       }),
       resave: false, 
       saveUninitialized: false,
       cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-        httpOnly: true
-      }
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: false // deixe como false em localhost
+            }
     });
 
     // Usando middlewares

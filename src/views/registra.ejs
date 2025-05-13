@@ -6,8 +6,30 @@
     <div class="col-md-6 my-4">
       <h2 class="text-center">Criar Conta</h2>
 
+      <!-- Exibir mensagens de erro -->
+      <% if (errors && errors.length > 0) { %>
+        <div class="alert alert-danger">
+          <ul>
+            <% errors.forEach(function(error) { %>
+              <li><%= error %></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+
+      <!-- Exibir mensagem de sucesso -->
+      <% if (success && success.length > 0) { %>
+        <div class="alert alert-success">
+          <ul>
+            <% success.forEach(function(msg) { %>
+              <li><%= msg %></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+
       <form action="/registra" method="POST">
-        <!-- CSRF Token obrigatório se estiver usando o middleware -->
+        
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
         <div class="mb-3">

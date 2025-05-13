@@ -1,14 +1,36 @@
+const Login = require('../models/LoginModel');
+
 exports.index = (req, res) => {
-    res.render('login');
+  // Renderiza a página de login com mensagens de erro ou sucesso, se houver
+  res.render('login', {
+    email: '',  // Inicia o email como vazio
+    errors: req.flash('errors'),
+    success: req.flash('success')
+  });
 };
 
-exports.login = (req, res) => {
-    const { email, password } = req.body;
-    
-    // Aqui você pode adicionar a lógica de verificação do e-mail e senha (normalmente com um banco de dados)
-    if (email === "usuario@example.com" && password === "senha123") {
-      res.redirect('/agenda');  // Se o login for bem-sucedido, redireciona para a agenda
-    } else {
-      res.redirect('/login');  // Caso contrário, volta para a tela de login
-    }
-  };
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  const login = new Login({ email, password });
+
+  await login.login();
+
+  if (login.errors.length > 0) {
+    req.flash('errors', login.errors);
+    return res.render('login', {
+      email,
+      errors: req.flash('errors'),
+      success: req.flash('success')
+    });
+  }
+
+  req.session.user = login.user;
+  
+  // 🔥 Aguarde salvar a sessão antes de redirecionar
+  req.session.save(() => {
+    req.flash('success', 'Login bem-sucedido!');
+    res.redirect('/agenda');
+  });
+};
+
+
