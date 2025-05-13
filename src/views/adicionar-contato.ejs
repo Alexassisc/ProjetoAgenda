@@ -6,31 +6,39 @@
     <div class="col-lg-8 offset-lg-2 my-3">
       <h1 class="text-center">Adicionar Novo Contato</h1>
 
+      <!-- Exibir erros, caso existam -->
+      <% if (errors && errors.length > 0) { %>
+        <div class="alert alert-danger">
+          <ul>
+            <% errors.forEach(error => { %>
+              <li><%= error %></li>
+            <% }); %>
+          </ul>
+        </div>
+      <% } %>
+
       <!-- Formulário para adicionar um novo contato -->
       <form action="/agenda/adicionar" method="POST">
-        <!-- Adicione o token CSRF aqui -->
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+         <!-- Adicionando o CSRF Token -->
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-        <div class="mb-3">
-          <label for="nome" class="form-label">Nome</label>
-          <input type="text" class="form-control" name="nome" required>
-        </div>
-        <div class="mb-3">
-          <label for="sobrenome" class="form-label">Sobrenome</label>
-          <input type="text" class="form-control" name="sobrenome" required>
-        </div>
-        <div class="mb-3">
-          <label for="telefone" class="form-label">Telefone</label>
-          <input type="text" class="form-control" name="telefone" required>
-        </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" name="email" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Adicionar</button>
-      </form>
-    </div>
+  <div class="mb-3">
+    <label for="nome" class="form-label">Nome</label>
+    <input type="text" class="form-control" name="nome" required>
   </div>
-</div>
-
-<%- include('includes/footer') %>
+  <div class="mb-3">
+    <label for="sobrenome" class="form-label">Sobrenome</label>
+    <input type="text" class="form-control" name="sobrenome" required>
+  </div>
+  <div class="mb-3">
+    <label for="telefone" class="form-label">Telefone</label>
+    <input type="text" class="form-control" name="telefone" pattern="^(?!.*(\d)\1{7})\d{10,11}$" maxlength="11" required>
+    <small class="form-text text-muted">O telefone deve ter 10 ou 11 dígitos.</small>
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" class="form-control" name="email" required>
+    <small class="form-text text-muted">Por favor, insira um e-mail válido.</small>
+  </div>
+  <button type="submit" class="btn btn-primary">Adicionar</button>
+</form>

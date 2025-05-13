@@ -6,9 +6,21 @@
     <div class="col-lg-8 offset-lg-2 my-3">
       <h1 class="text-center">Editar Contato</h1>
 
-      <!-- Adicionando o CSRF Token -->
+      <!-- Exibir erros, caso existam -->
+      <% if (errors && errors.length > 0) { %>
+        <div class="alert alert-danger">
+          <ul>
+            <% errors.forEach(error => { %>
+              <li><%= error %></li>
+            <% }); %>
+          </ul>
+        </div>
+      <% } %>
+
+      <!-- Formulário para editar o contato -->
       <form action="/agenda/editar/<%= contato._id %>" method="POST">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>"> <!-- Campo CSRF -->
+        <!-- Adicionando o CSRF Token -->
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
         <div class="mb-3">
           <label for="nome" class="form-label">Nome</label>
@@ -18,14 +30,25 @@
           <label for="sobrenome" class="form-label">Sobrenome</label>
           <input type="text" class="form-control" name="sobrenome" value="<%= contato.sobrenome %>" required>
         </div>
+
         <div class="mb-3">
           <label for="telefone" class="form-label">Telefone</label>
-          <input type="text" class="form-control" name="telefone" value="<%= contato.telefone %>" required>
+          <input type="text" class="form-control" name="telefone" value="<%= contato.telefone %>" pattern="^(?!.*(\d)\1{7})\d{10,11}$" maxlength="11" required>
+          <small class="form-text text-muted">O telefone deve ter 10 ou 11 dígitos.</small>
+          <% if (errors && errors.some(error => error.includes('Número de telefone inválido'))) { %>
+            <div class="text-danger">Número de telefone inválido. Deve ter 10 ou 11 dígitos.</div>
+          <% } %>
         </div>
+
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
           <input type="email" class="form-control" name="email" value="<%= contato.email %>" required>
+          <small class="form-text text-muted">Por favor, insira um e-mail válido.</small>
+          <% if (errors && errors.some(error => error.includes('Email inválido'))) { %>
+            <div class="text-danger">Email inválido.</div>
+          <% } %>
         </div>
+
         <button type="submit" class="btn btn-primary">Atualizar</button>
       </form>
     </div>

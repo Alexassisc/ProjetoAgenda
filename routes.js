@@ -16,16 +16,9 @@ route.get('/', homeController.index);
 route.get('/login', loginController.index);
 route.post('/login', loginController.login);
 
+
 // Logout
-route.get('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.redirect('/agenda'); // Caso algo dê errado, redireciona para a agenda
-    }
-    res.clearCookie('connect.sid'); // Limpa o cookie da sessão
-    res.redirect('/login'); // Redireciona para a página de login
-  });
-});
+route.get('/logout', loginController.logout);
 
 // Registro
 route.get('/registra', registraController.index);

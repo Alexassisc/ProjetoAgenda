@@ -20,6 +20,7 @@ exports.addCsrfToken = (req, res, next) => {
 
 // Middleware global para adicionar variáveis gerais à resposta
 exports.middlewareGlobal = (req, res, next) => {
+  res.set('Cache-Control', 'no-store'); // Essa linha impede que o navegador armazene em cache páginas protegidas.
   res.locals.umaVariavelLocal = 'Formulário';
 
   res.locals.user = req.session.user || null; // <- Isso garante que user sempre exista, mesmo que seja null

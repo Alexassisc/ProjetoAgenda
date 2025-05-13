@@ -33,4 +33,16 @@ exports.login = async (req, res) => {
   });
 };
 
+exports.logout = (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      console.log('Erro ao destruir a sessão:', err);
+      return res.redirect('/agenda');
+    }
+    res.clearCookie('connect.sid'); // Limpa o cookie da sessão
+    res.set('Cache-Control', 'no-store'); // Bloqueia cache
+    res.redirect('/login');
+  });
+};
+
 
