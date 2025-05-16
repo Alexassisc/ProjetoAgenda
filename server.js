@@ -17,7 +17,7 @@ const connectionString = process.env.MONGO_CONNECTION;
 // Conectar ao MongoDB e iniciar o servidor após a conexão
 mongoose.connect(connectionString)
   .then(() => {
-    console.log('✅ Conectado ao MongoDB');
+    console.log('Conectado ao MongoDB');
 
     // Middlewares
     app.use(helmet());
