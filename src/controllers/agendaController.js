@@ -13,7 +13,10 @@ exports.index = async (req, res) => {
 
 // Exibe formulário para adicionar novo contato
 exports.addForm = (req, res) => {
-  res.render('adicionar-contato');
+  res.render('adicionar-contato', {
+    errors: req.flash('errors'),
+    csrfToken: req.csrfToken()
+  });
 };
 
 // Cria novo contato
@@ -21,33 +24,34 @@ exports.create = async (req, res) => {
   try {
     const { nome, sobrenome, telefone, email } = req.body;
 
-    // Função de validação para o telefone
-    const telefoneRegex = /^[0-9]{10,11}$/;
-    if (!telefoneRegex.test(telefone)) {
-      req.flash('errors', 'Número de telefone inválido. Deve ter 10 ou 11 dígitos.');
+    // Verificar se pelo menos telefone ou email foi informado
+    if (!telefone && !email) {
+      req.flash('errors', 'Informe pelo menos telefone ou e-mail.');
       return res.redirect('/agenda/adicionar');
     }
 
-    // Função de validação para o e-mail
+    // Validação de telefone
+    const telefoneRegex = /^(?!.*(\d)\1{7})\d{10,11}$/;
+    if (telefone && !telefoneRegex.test(telefone)) {
+      req.flash('errors', 'Número de telefone inválido. Deve ter 10 ou 11 dígitos e não conter muitos dígitos repetidos.');
+      return res.redirect('/agenda/adicionar');
+    }
+
+    // Validação de e-mail
     const dominiosValidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'uol.com.br', 'yahoo.com', 'icloud.com'];
 
     function dominioEhValido(email) {
       const dominio = email.split('@')[1];
-      
-      // Permitir se for um dos domínios da lista
       if (dominiosValidos.includes(dominio)) return true;
-
-      // Permitir domínios corporativos: pelo menos uma `.`, e termina com letras
       const dominioCorporativoRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       return dominioCorporativoRegex.test(dominio);
     }
 
-    if (!dominioEhValido(email)) {
+    if (email && !dominioEhValido(email)) {
       req.flash('errors', 'Email inválido. Domínio não permitido.');
       return res.redirect('/agenda/adicionar');
     }
 
-    // Cria um novo contato
     const novoContato = new Agenda({
       nome,
       sobrenome,
@@ -56,7 +60,6 @@ exports.create = async (req, res) => {
       usuario: req.session.user ? req.session.user._id : null
     });
 
-    // Salva o novo contato
     await novoContato.save();
 
     req.flash('success', 'Contato criado com sucesso!');
@@ -64,9 +67,7 @@ exports.create = async (req, res) => {
   } catch (error) {
     const erros = [];
 
-    // Se for um erro de validação
     if (error.name === 'ValidationError') {
-      // Verifica se o erro foi relacionado ao telefone ou ao e-mail
       for (let field in error.errors) {
         erros.push(error.errors[field].message);
       }
@@ -74,12 +75,13 @@ exports.create = async (req, res) => {
       erros.push('Erro ao criar contato.');
     }
 
-    // Passa os erros para o EJS (na página de criação de contato)
     req.flash('errors', erros);
-    res.render('adicionar-contato', { errors: erros });
+    res.render('adicionar-contato', {
+      errors: erros,
+      csrfToken: req.csrfToken()
+    });
   }
 };
-
 
 // Exibe formulário de edição
 exports.editForm = async (req, res) => {
@@ -89,11 +91,11 @@ exports.editForm = async (req, res) => {
       req.flash('errors', 'Contato não encontrado.');
       return res.redirect('/agenda');
     }
-    
+
     res.render('editarContato', {
       contato,
       csrfToken: req.csrfToken(),
-      errors: req.flash('errors') // ← Isso está correto
+      errors: req.flash('errors')
     });
   } catch (error) {
     console.log(error);
@@ -107,33 +109,31 @@ exports.update = async (req, res) => {
   try {
     const { nome, sobrenome, telefone, email } = req.body;
 
-    // Validar telefone (10 ou 11 dígitos)
-    const telefoneRegex = /^[0-9]{10,11}$/;
-    if (!telefoneRegex.test(telefone)) {
-      req.flash('errors', 'Número de telefone inválido. Deve ter 10 ou 11 dígitos.');
+    if (!telefone && !email) {
+      req.flash('errors', 'Informe pelo menos telefone ou e-mail.');
       return res.redirect(`/agenda/editar/${req.params.id}`);
     }
 
-    // Função de validação para o e-mail
+    const telefoneRegex = /^(?!.*(\d)\1{7})\d{10,11}$/;
+    if (telefone && !telefoneRegex.test(telefone)) {
+      req.flash('errors', 'Número de telefone inválido. Deve ter 10 ou 11 dígitos e não conter muitos dígitos repetidos.');
+      return res.redirect(`/agenda/editar/${req.params.id}`);
+    }
+
     const dominiosValidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'uol.com.br', 'yahoo.com', 'icloud.com'];
 
     function dominioEhValido(email) {
       const dominio = email.split('@')[1];
-      
-      // Permitir se for um dos domínios da lista
       if (dominiosValidos.includes(dominio)) return true;
-
-      // Permitir domínios corporativos: pelo menos uma `.`, e termina com letras
       const dominioCorporativoRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       return dominioCorporativoRegex.test(dominio);
     }
 
-    if (!dominioEhValido(email)) {
+    if (email && !dominioEhValido(email)) {
       req.flash('errors', 'Email inválido. Domínio não permitido.');
       return res.redirect(`/agenda/editar/${req.params.id}`);
     }
 
-    // Atualizar o contato
     await Agenda.findByIdAndUpdate(req.params.id, {
       nome,
       sobrenome,
@@ -149,7 +149,6 @@ exports.update = async (req, res) => {
     res.redirect(`/agenda/editar/${req.params.id}`);
   }
 };
-
 
 // Deleta contato
 exports.delete = async (req, res) => {
