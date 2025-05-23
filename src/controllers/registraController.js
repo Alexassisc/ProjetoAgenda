@@ -1,6 +1,5 @@
 // src/controllers/registraController.js
 const Login = require('../models/LoginModel');  // Agora estamos usando a classe Login
-const bcrypt = require('bcryptjs');
 
 exports.index = (req, res) => {
   res.render('registra', {
